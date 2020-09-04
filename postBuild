@@ -7,3 +7,5 @@ jupyter lab build
 
 # Install the Pluto proxy
 pip install -e.
+
+julia -e "import Pkg; Pkg.add(Pkg.PackageSpec(;name=\"Pluto\", rev=\"183ec96\"))"
