@@ -6,6 +6,31 @@ jupyter labextension install @jupyterlab/server-proxy
 jupyter lab build
 
 # Install the Pluto proxy
-pip install -e.
+# pip install -e.
 
-julia -e "import Pkg; Pkg.add(Pkg.PackageSpec(;name=\"Pluto\", rev=\"183ec96\"))"
+julia <<__EOF__
+import Pkg
+Pkg.add(Pkg.PackageSpec(name="PackageCompiler", version="1.2.1"))
+import PackageCompiler
+PackageCompiler.restore_default_sysimage()
+__EOF__
+
+rm precompile.jl
+
+julia --project=$(pwd) --trace-compile="precompile.jl" -e "import Pluto; Pluto.run(1234)" &
+sleep 5
+wget -qO- "http://localhost:1234/sample/Tower%20of%20Hanoi.jl" &> /dev/null
+echo "DONE WITH REQUEST"
+sleep 20
+kill $!
+sleep 2
+
+julia <<__EOF__
+import Pkg
+Pkg.add(Pkg.PackageSpec(name="PackageCompiler", version="1.2.1"))
+import PackageCompiler
+Pkg.activate(".")
+Pkg.instantiate()
+Pkg.API.precompile()
+PackageCompiler.create_sysimage(:Pluto, precompile_statements_file="precompile.jl", replace_default=true)
+__EOF__
