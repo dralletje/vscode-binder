@@ -26,7 +26,7 @@ import PackageCompiler
 Pkg.activate(".")
 Pkg.instantiate()
 Pkg.API.precompile()
-PackageCompiler.create_sysimage(:Pluto, precompile_statements_file="precompile.jl", sysimage_path="precompile.so")
+PackageCompiler.create_sysimage(:Pluto, precompile_statements_file="precompile.jl", cpu_target="generic", sysimage_path="precompile.so")
 __EOF__
 
 cp precompile.so jupyter_pluto_proxy/precompile.so
